@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#00000000</color>
+    <color name="colorPrimaryDark">#4b5c93</color>
+    <color name="colorAccent">#af2727</color>
+    <color name="colorTextPrimary">#fff</color>
+    <color name="colorTextSecondary">#fff</color>
+    <color name="colorBeige">#f4f2e3</color>
+    <color name="colorJokeCard">#b7e3ff</color>
+</resources>
