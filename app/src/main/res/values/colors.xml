@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#00000000</color>
-    <color name="colorPrimaryDark">#4b5c93</color>
+    <color name="colorPrimary">#9fa8da</color>
+    <color name="colorPrimaryDark">#2c3961</color>
     <color name="colorAccent">#af2727</color>
     <color name="colorTextPrimary">#fff</color>
     <color name="colorTextSecondary">#fff</color>
-    <color name="colorBeige">#f4f2e3</color>
     <color name="colorJokeCard">#b7e3ff</color>
+    <color name="colorWhiteTr30">#8dffffff</color>
+    <color name="colorWhiteTr55">#a5ffffff</color>
+
+    <color name="colorBlue">#2095f2</color>
 </resources>

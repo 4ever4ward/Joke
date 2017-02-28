@@ -1,59 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardContainer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:layout_marginBottom="48dp"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp"
-    android:layout_marginTop="64dp">
+    android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/background"
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="14dp">
 
-        <LinearLayout
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="12dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:background="@drawable/shape1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical" />
+            android:padding="16dp">
 
-    </FrameLayout>
+            <ua.matvienko_apps.joke.CustomScrollView
+                android:id="@+id/myScroll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="40dp">
 
+                <TextView
+                    android:id="@+id/jokeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="На следующей неделе моя жена с детьми уезжает погостить у мамы. И я на две недели, вместе с диваном, телеканалом &quot;Спорт&quot;, пивом, удочками, лодкой и многочисленными друзьями медленно погружусь в пучину &quot;одиночества&quot;. "
+                    android:textColor="#434343"
+                    android:textSize="22sp" />
+            </ua.matvienko_apps.joke.CustomScrollView>
 
-
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="18dp"
-            android:gravity="center_horizontal"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="3dp">
-
-
-
-
-            <TextView
-                android:id="@+id/jokeText"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="left"
-                android:padding="4dp"
-                android:textColor="#787878"
-                android:textSize="16sp"
-                android:text="Lorem ipsum dol or sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." />
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="7dp"
+                android:layout_marginEnd="7dp"
+                android:layout_marginStart="7dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/starredView"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="start"
+                    android:src="@drawable/favorites_click" />
+
+                <ImageView
+                    android:id="@+id/copyToClipBoardView"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="60dp"
+                    android:layout_marginRight="60dp"
+                    android:src="@drawable/ic_copy" />
+
+                <ImageView
+                    android:id="@+id/shareView"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_share" />
+
+            </FrameLayout>
 
 
-        </android.support.v7.widget.CardView>
+        </FrameLayout>
+
+
+    </android.support.v7.widget.CardView>
 
 
 </FrameLayout>

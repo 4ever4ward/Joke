@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 
+import ua.matvienko_apps.joke.CustomScrollView;
+import ua.matvienko_apps.joke.R;
+
 /**
  * Created by Alexandr on 17/02/2017.
  */
@@ -27,26 +30,20 @@ public class FlingCardListener implements View.OnTouchListener {
     private final FlingListener mFlingListener;
     private final Object dataObject;
     private final float halfWidth;
+    private final int TOUCH_ABOVE = 0;
+    private final int TOUCH_BELOW = 1;
+    private final Object obj = new Object();
     private float BASE_ROTATION_DEGREES;
-
     private float aPosX;
     private float aPosY;
     private float aDownTouchX;
     private float aDownTouchY;
-
     // The active pointer is the one currently moving our object.
     private int mActivePointerId = INVALID_POINTER_ID;
     private View frame = null;
-
-
-    private final int TOUCH_ABOVE = 0;
-    private final int TOUCH_BELOW = 1;
     private int touchPosition;
-    private final Object obj = new Object();
     private boolean isAnimationRunning = false;
     private float MAX_COS = (float) Math.cos(Math.toRadians(45));
-
-    private View image;
 
     public FlingCardListener(View frame, Object itemAtPosition, FlingListener flingListener) {
         this(frame, itemAtPosition, 15f, flingListener);
@@ -137,32 +134,47 @@ public class FlingCardListener implements View.OnTouchListener {
                 final float xMove = event.getX(pointerIndexMove);
                 final float yMove = event.getY(pointerIndexMove);
 
+
                 // Calculate the distance moved
                 final float dx = xMove - aDownTouchX;
                 final float dy = yMove - aDownTouchY;
 
-
                 // Move the frame
                 aPosX += dx;
-                aPosY += dy;
+                aPosY += 0;
+
+                /** Use this code for move element from by y
+                 ** aPosY += dy;
+                 **/
 
                 // calculate the rotation degrees
                 float distobjectX = aPosX - objectX;
                 float rotation = BASE_ROTATION_DEGREES * 2.f * distobjectX / parentWidth;
 
-                // Using this part of code can change moving card if touchPosition == TOUCH_BELOW
+                CustomScrollView myScrollView = (CustomScrollView) view.findViewById(R.id.myScroll);
+                myScrollView.setEnableScrolling(false);
+
+
+                if (distobjectX < 25 && distobjectX > -25) {
+                    aPosX -= distobjectX;
+
+                    myScrollView.smoothScrollBy(0, (int) (-1 * dy / 8));
+
+                    frame.setX(aPosX);
+                    frame.setRotation(rotation);
+
+                } else {
+//                    in this area would be code for doing something with the view as the frame moves.
+
+//                     Using this part of code can change moving card if touchPosition == TOUCH_BELOW
 //                if (touchPosition == TOUCH_BELOW) {
 //                    rotation = -rotation;
 //                }
 
-                //in this area would be code for doing something with the view as the frame moves.
-                frame.setX(aPosX);
-                frame.setY(aPosY);
-                frame.setRotation(rotation);
-
-//                if (image!=null) {
-//                    image.setAlpha();
-//                }
+                    frame.setX(aPosX);
+                    frame.setY(aPosY);
+                    frame.setRotation(rotation);
+                }
 
                 mFlingListener.onScroll(getScrollProgressPercent());
                 break;
@@ -175,10 +187,6 @@ public class FlingCardListener implements View.OnTouchListener {
         }
 
         return true;
-    }
-
-    public void setImage(View image) {
-        this.image = image;
     }
 
     private float getScrollProgressPercent() {
@@ -195,11 +203,11 @@ public class FlingCardListener implements View.OnTouchListener {
     private boolean resetCardViewOnStack() {
         if (movedBeyondLeftBorder()) {
             // Left Swipe
-            onSelected(true, getExitPoint(-objectW), 100);
+            onSelected(true, getExitPoint(-objectW), 175);
             mFlingListener.onScroll(-1.0f);
         } else if (movedBeyondRightBorder()) {
             // Right Swipe
-            onSelected(false, getExitPoint(parentWidth), 100);
+            onSelected(false, getExitPoint(parentWidth), 175);
             mFlingListener.onScroll(1.0f);
         } else {
             float abslMoveDistance = Math.abs(aPosX - objectX);
@@ -306,9 +314,9 @@ public class FlingCardListener implements View.OnTouchListener {
 
     private float getExitRotation(boolean isLeft) {
         float rotation = BASE_ROTATION_DEGREES * 2.f * (parentWidth - objectX) / parentWidth;
-        if (touchPosition == TOUCH_BELOW) {
-            rotation = -rotation;
-        }
+//        if (touchPosition == TOUCH_BELOW) {
+//            rotation = -rotation;
+//        }
         if (isLeft) {
             rotation = -rotation;
         }

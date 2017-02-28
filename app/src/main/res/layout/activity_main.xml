@@ -1,40 +1,85 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <!-- activity view -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark">
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp">
+
+            <ImageView
+                android:id="@+id/appImage"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="start"
+                android:layout_marginLeft="5dp"
+                android:src="@mipmap/ic_launcher" />
+
+            <Spinner
+                android:id="@+id/spinnerCustom"
+                android:layout_width="220dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="15dp"
+                android:layout_marginStart="15dp"
+                android:background="@drawable/spinner_background" />
+
+            <ImageView
+                android:id="@+id/favouritesImage"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_star" />
+
+        </FrameLayout>
 
         <ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView
             android:id="@+id/card_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:rotation_degrees="15.5"
-            app:max_visible="2"/>
+            android:layout_marginBottom="50dp"
+            android:layout_marginTop="55dp"
+            app:max_visible="2"
+            app:rotation_degrees="20" />
+
 
         <ImageView
             android:id="@+id/leftSwipeImage"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:alpha="0"
             android:layout_gravity="center"
-            android:background="@color/colorAccent"/>
+            android:layout_marginBottom="30dp"
+            android:alpha="0"
+            android:background="@drawable/ic_like" />
 
         <ImageView
             android:id="@+id/rightSwipeImage"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:alpha="0"
             android:layout_gravity="center"
-            android:background="@color/colorAccent"/>
+            android:alpha="0"
+            android:background="@drawable/ic_dislike" />
 
     </FrameLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:adSize="SMART_BANNER"
+        app:adUnitId="@string/banner_ad_unit_id" />
 
 </FrameLayout>
