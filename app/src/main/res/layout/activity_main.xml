@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
-    <!-- activity view -->
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -49,8 +49,7 @@
             android:id="@+id/card_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="50dp"
-            android:layout_marginTop="55dp"
+            android:layout_marginTop="52dp"
             app:max_visible="2"
             app:rotation_degrees="20" />
 
@@ -77,9 +76,10 @@
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_gravity="bottom"
         app:adSize="SMART_BANNER"
         app:adUnitId="@string/banner_ad_unit_id" />
+
 
 </FrameLayout>

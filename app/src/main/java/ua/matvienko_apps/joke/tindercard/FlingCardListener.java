@@ -161,7 +161,7 @@ public class FlingCardListener implements View.OnTouchListener {
                     myScrollView.smoothScrollBy(0, (int) (-1 * dy / 8));
 
                     frame.setX(aPosX);
-                    frame.setRotation(rotation);
+//                    frame.setRotation(rotation);
 
                 } else {
 //                    in this area would be code for doing something with the view as the frame moves.

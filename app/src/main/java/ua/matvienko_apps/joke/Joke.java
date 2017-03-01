@@ -6,28 +6,30 @@ package ua.matvienko_apps.joke;
 
 public class Joke {
 
-    public static int STARRED_TRUE = 1;
-    public static int STARRED_FALSE = 0;
+    public static int FAVOURITES_TRUE = 1;
+    public static int FAVOURITES_FALSE = 0;
 
     public static int LIKE = 1;
     public static int DISLIKE = 0;
 
+    private long jokeDate;
+    private String jokeCategory;
     private String jokeText;
-    private String categoryText;
-    private int jokeVotes;
-    private int jokeStarred;
+    private int jokeLikes;
+    private int jokeDislikes;
 
-    public Joke(String jokeText, int jokeVotes, int jokeStarred) {
+    public Joke(long jokeDate, String jokeCategory, String jokeText, int jokeLikes, int jokeDislikes) {
+        this.jokeDate = jokeDate;
+        this.jokeCategory = jokeCategory;
         this.jokeText = jokeText;
-        this.jokeVotes = jokeVotes;
-        this.jokeStarred = jokeStarred;
+        this.jokeLikes = jokeLikes;
+        this.jokeDislikes = jokeDislikes;
     }
 
-    public Joke(String jokeText, String categoryText, int jokeVotes, int jokeStarred) {
+    // TODO: delete this constructor
+    public Joke(String jokeText) {
         this.jokeText = jokeText;
-        this.categoryText = categoryText;
-        this.jokeVotes = jokeVotes;
-        this.jokeStarred = jokeStarred;
+        this.jokeLikes = jokeLikes;
     }
 
     public String getJokeText() {
@@ -39,23 +41,35 @@ public class Joke {
         this.jokeText = jokeText;
     }
 
-    public int getJokeVotes() {
-        return jokeVotes;
+    public String getJokeCategory() {
+        return jokeCategory;
     }
 
-    public void setJokeVotes(int jokeVotes) {
-        this.jokeVotes = jokeVotes;
+    public void setJokeCategory(String jokeCategory) {
+        this.jokeCategory = jokeCategory;
     }
 
-    public int getJokeStarred() {
-        return jokeStarred;
+    public int getJokeDislikes() {
+        return jokeDislikes;
     }
 
-    public void setJokeStarred(int jokeStarred) {
-        this.jokeStarred = jokeStarred;
+    public void setJokeDislikes(int jokeDislikes) {
+        this.jokeDislikes = jokeDislikes;
     }
 
-    public boolean isStarred() {
-        return jokeStarred == STARRED_TRUE;
+    public int getJokeLikes() {
+        return jokeLikes;
+    }
+
+    public void setJokeLikes(int jokeLikes) {
+        this.jokeLikes = jokeLikes;
+    }
+
+    public long getJokeDate() {
+        return jokeDate;
+    }
+
+    public void setJokeDate(long jokeDate) {
+        this.jokeDate = jokeDate;
     }
 }

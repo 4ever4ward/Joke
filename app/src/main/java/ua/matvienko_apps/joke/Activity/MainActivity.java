@@ -23,10 +23,11 @@ import com.google.android.gms.ads.AdView;
 import java.util.ArrayList;
 
 import ua.matvienko_apps.joke.Joke;
-import ua.matvienko_apps.joke.OurAppsActivity;
 import ua.matvienko_apps.joke.R;
 import ua.matvienko_apps.joke.adapters.CustomSpinnerAdapter;
 import ua.matvienko_apps.joke.adapters.JokeCardAdapter;
+import ua.matvienko_apps.joke.data.AppDBContract;
+import ua.matvienko_apps.joke.data.DataProvider;
 import ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView;
 
 
@@ -179,23 +180,13 @@ public class MainActivity extends AppCompatActivity {
         adView.loadAd(adRequest);
 
 
+        DataProvider dataProvider = new DataProvider(getApplicationContext());
+
         // fill array lie data for init jokeAdapter
         jokeArrayList = new ArrayList<>();
-        for (int i = 0; i < 15; i++)
-            jokeArrayList.add(new Joke(i + "На следующей неделе моя жена с детьми уезжает погостить у мамы." +
-                    " И я на две недели, вместе с диваном, телеканалом \"Спорт\"," +
-                    " пивом, удочками, лодкой и многочисленными друзьями медленно погружусь в пучину \"одиночества\".На следующей неделе моя жена с детьми уезжает погостить у мамы.\" +\n" +
-                    "                    \" И я на две недели, вместе с диваном, телеканалом \\\"Спорт\\\",\" +\n" +
-                    "                    \" пивом, удочками, лодкой и многочисленными друзьями медленно погружусь в пучину \"одиночества\".На следующей неделе моя жена с детьми уезжает погостить у мамы.\" +\n" +
-                    "                    \" И я на две недели, вместе с диваном, телеканалом \\\"Спорт\\\",\" +\n" +
-                    "                    \" пивом, удочками, лодкой и многочисленными друзьями медленно погружусь в пучину \"одиночества\".На следующей неделе моя жена с детьми уезжает погостить у мамы.\" +\n" +
-                    "                    \" И я на две недели, вместе с диваном, телеканалом \\\"Спорт\\\",\" +\n" +
-                    "                    \" пивом, удочками, лодкой и многочисленными друзьями медленно погружусь в пучину \"одиночества\".На следующей неделе моя жена с детьми уезжает погостить у мамы.\" +\n" +
-                    "                    \" И я на две недели, вместе с диваном, телеканалом \\\"Спорт\\\",\" +\n" +
-                    "                    \" пивом, удочками, лодкой и многочисленными друзьями медленно погружусь в пучину \"одиночества\". ", Joke.LIKE, Joke.STARRED_FALSE));
+        jokeArrayList = dataProvider.getAllJokes(AppDBContract.JokeEntries.TABLE_NAME);
 
-
-        Spinner spinnerCustom = (Spinner) findViewById(R.id.spinnerCustom);
+        Spinner spinner = (Spinner) findViewById(R.id.spinnerCustom);
         // Spinner Drop down elements
         ArrayList<String> categories = new ArrayList<String>();
         categories.add("Популярные");
@@ -205,8 +196,8 @@ public class MainActivity extends AppCompatActivity {
         categories.add("Про Тёщу");
         CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, categories);
 
-        spinnerCustom.setAdapter(customSpinnerAdapter);
-        spinnerCustom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinner.setAdapter(customSpinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
@@ -269,6 +260,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         adView.resume();
+
+//        // If banner not shown than hide adView
+//        if(!adView.isShown()) {
+//            adView.destroy();
+//            adView.setVisibility(View.GONE);
+//        } else {
+//            adView.setVisibility(View.VISIBLE);
+//        }
 
     }
 
