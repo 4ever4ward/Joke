@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.PointF;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -14,10 +15,6 @@ import android.widget.Adapter;
 import android.widget.FrameLayout;
 
 import ua.matvienko_apps.joke.R;
-
-/**
- * Created by Alexandr on 17/02/2017.
- */
 
 public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 
@@ -124,14 +121,6 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
         if (adapterCount <= MIN_ADAPTER_STACK) mFlingListener.onAdapterAboutToEmpty(adapterCount);
     }
 
-
-//    public View getUnderChildView() {
-//        View underChild = mAdapter.getView(1, null, this);
-//
-//        return underChild;
-//    }
-
-
     private void layoutChildren(int startingIndex, int adapterCount) {
         while (startingIndex < Math.min(adapterCount, MAX_VISIBLE)) {
             View newUnderChild = mAdapter.getView(startingIndex, null, this);
@@ -139,7 +128,7 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 //                ((CardView)newUnderChild.findViewById(R.id.cardView)).setCardBackgroundColor(getResources().getColor(R.color.colorWhiteTr30));
                 CardView cardView = (CardView) newUnderChild.findViewById(R.id.cardView);
 
-                cardView.setCardBackgroundColor(getResources().getColor(R.color.colorWhiteTr30));
+                cardView.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorWhiteTr30));
                 cardView.setCardElevation(0);
 
                 newUnderChild.findViewById(R.id.jokeText).setAlpha(0.30f);
