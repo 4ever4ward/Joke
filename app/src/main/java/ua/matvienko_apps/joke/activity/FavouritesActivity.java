@@ -11,9 +11,9 @@ import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
-import ua.matvienko_apps.joke.Joke;
 import ua.matvienko_apps.joke.R;
 import ua.matvienko_apps.joke.adapters.JokeCardAdapter;
+import ua.matvienko_apps.joke.classes.Joke;
 import ua.matvienko_apps.joke.data.AppDBContract;
 import ua.matvienko_apps.joke.data.DataProvider;
 import ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView;
@@ -53,7 +53,7 @@ public class FavouritesActivity extends AppCompatActivity {
         DataProvider dataProvider = new DataProvider(getApplicationContext());
 
         // List of all joke's from favourites table
-        jokeArrayList = dataProvider.getAllJokes(AppDBContract.FavouritesEntries.TABLE_NAME);
+        jokeArrayList = dataProvider.getAllJokesFromDB(AppDBContract.FavouritesEntry.TABLE_NAME);
 
         jokeAdapter = new JokeCardAdapter(jokeArrayList, FavouritesActivity.this);
         flingContainer.setAdapter(jokeAdapter);
@@ -61,7 +61,7 @@ public class FavouritesActivity extends AppCompatActivity {
         final int favouritesListSize = jokeArrayList.size();
 
         // Fill TextView, where displayed number and quantity of card's
-        jokeQuantityText.setText((jokeBackStackList.size() + 1) + "/" + favouritesListSize);
+        jokeQuantityText.setText((jokeBackStackList.size()) + "/" + favouritesListSize);
 
 
         homeImageView.setOnClickListener(new View.OnClickListener() {
@@ -79,12 +79,13 @@ public class FavouritesActivity extends AppCompatActivity {
 
             @Override
             public void onLeftCardExit(Object dataObject) {
-                jokeBackStackList.add(jokeArrayList.get(0));
-                jokeArrayList.remove(0);
+                if (jokeArrayList.size() > 1) {
+                    jokeBackStackList.add(jokeArrayList.get(0));
+                    jokeArrayList.remove(0);
+                }
                 jokeAdapter.notifyDataSetChanged();
 
                 jokeQuantityText.setText((jokeBackStackList.size() + 1) + "/" + favouritesListSize);
-
 
             }
 

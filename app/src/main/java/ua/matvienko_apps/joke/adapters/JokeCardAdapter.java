@@ -13,11 +13,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import ua.matvienko_apps.joke.CustomScrollView;
-import ua.matvienko_apps.joke.Joke;
 import ua.matvienko_apps.joke.R;
+import ua.matvienko_apps.joke.activity.FavouritesActivity;
+import ua.matvienko_apps.joke.classes.CustomScrollView;
+import ua.matvienko_apps.joke.classes.Joke;
 
 
 /**
@@ -26,11 +27,11 @@ import ua.matvienko_apps.joke.R;
 public class JokeCardAdapter extends BaseAdapter {
 
     private final String TAG = JokeCardAdapter.class.getSimpleName();
-    public ViewHolder viewHolder;
-    public List<Joke> jokeList;
     public Context context;
+    private ViewHolder viewHolder;
+    private ArrayList<Joke> jokeList;
 
-    public JokeCardAdapter(List<Joke> jokeList, Context context) {
+    public JokeCardAdapter(ArrayList<Joke> jokeList, Context context) {
         this.jokeList = jokeList;
         this.context = context;
     }
@@ -42,7 +43,7 @@ public class JokeCardAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return position;
+        return jokeList.get(position);
     }
 
     @Override
@@ -55,18 +56,12 @@ public class JokeCardAdapter extends BaseAdapter {
 
         View rootView = convertView;
 
-
         if (rootView == null) {
 
             LayoutInflater inflater = LayoutInflater.from(context);
-            rootView = inflater.inflate(R.layout.joke_item_card, parent, false);
+            rootView = inflater.inflate(R.layout.item_joke_card, parent, false);
 
-            viewHolder = new ViewHolder();
-
-            viewHolder.jokeTextView = (TextView) rootView.findViewById(R.id.jokeText);
-            viewHolder.favouritesView = (ImageView) rootView.findViewById(R.id.starredView);
-            viewHolder.clipView = (ImageView) rootView.findViewById(R.id.copyToClipBoardView);
-            viewHolder.myScrollView = (CustomScrollView) rootView.findViewById(R.id.myScroll);
+            viewHolder = new ViewHolder(rootView);
 
             viewHolder.myScrollView.setEnableScrolling(false);
 
@@ -76,6 +71,9 @@ public class JokeCardAdapter extends BaseAdapter {
                     v.setActivated(!v.isActivated());
                 }
             });
+
+            if (context.getClass().getSimpleName().equals(FavouritesActivity.class.getSimpleName()))
+                viewHolder.favouritesView.callOnClick();
 
             viewHolder.clipView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -129,6 +127,13 @@ public class JokeCardAdapter extends BaseAdapter {
         public ImageView clipView;
         public ImageView shareView;
         public CustomScrollView myScrollView;
+
+        public ViewHolder(View view) {
+            jokeTextView = (TextView) view.findViewById(R.id.jokeText);
+            favouritesView = (ImageView) view.findViewById(R.id.starredView);
+            clipView = (ImageView) view.findViewById(R.id.copyToClipBoardView);
+            myScrollView = (CustomScrollView) view.findViewById(R.id.myScroll);
+        }
 
     }
 }

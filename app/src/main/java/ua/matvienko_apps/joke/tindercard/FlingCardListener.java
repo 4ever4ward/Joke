@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 
-import ua.matvienko_apps.joke.CustomScrollView;
 import ua.matvienko_apps.joke.R;
+import ua.matvienko_apps.joke.classes.CustomScrollView;
 
 /**
  * Created by Alexandr on 17/02/2017.

@@ -12,32 +12,33 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ua.matvienko_apps.joke.R;
+import ua.matvienko_apps.joke.classes.Category;
 
 /**
  * Created by Alexandr on 26/02/2017.
  */
 
-public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
+public class CategorySpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
 
     private final Context context;
-    private ArrayList<String> asr;
+    private ArrayList<Category> categoryList;
 
-    public CustomSpinnerAdapter(Context context, ArrayList<String> asr) {
-        this.asr = asr;
+    public CategorySpinnerAdapter(Context context, ArrayList<Category> categoryList) {
+        this.categoryList = categoryList;
         this.context = context;
     }
 
 
     public int getCount() {
-        return asr.size();
+        return categoryList.size();
     }
 
     public Object getItem(int i) {
-        return asr.get(i);
+        return categoryList.get(i);
     }
 
     public long getItemId(int i) {
-        return (long) i;
+        return (long) categoryList.get(i).getCategoryID();
     }
 
 
@@ -47,7 +48,7 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
         txt.setPadding(16, 16, 16, 16);
         txt.setTextSize(18);
         txt.setGravity(Gravity.CENTER_VERTICAL);
-        txt.setText(asr.get(position));
+        txt.setText(categoryList.get(position).getCategoryName());
         txt.setTextColor(Color.parseColor("#000000"));
         return txt;
     }
@@ -58,7 +59,7 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
         txt.setPadding(32, 14, 20, 16);
         txt.setTextSize(16);
         txt.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_ud, 0);
-        txt.setText(asr.get(i));
+        txt.setText(categoryList.get(i).getCategoryName());
         txt.setTextColor(Color.parseColor("#000000"));
         return txt;
     }

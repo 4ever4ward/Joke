@@ -54,7 +54,6 @@
             app:max_visible="2"
             app:rotation_degrees="20" />
 
-
         <ImageView
             android:id="@+id/leftSwipeImage"
             android:layout_width="150dp"

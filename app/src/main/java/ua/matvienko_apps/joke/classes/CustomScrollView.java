@@ -1,4 +1,4 @@
-package ua.matvienko_apps.joke;
+package ua.matvienko_apps.joke.classes;
 
 import android.content.Context;
 import android.util.AttributeSet;

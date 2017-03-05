@@ -5,9 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,11 +22,11 @@ import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
-import ua.matvienko_apps.joke.Joke;
 import ua.matvienko_apps.joke.R;
-import ua.matvienko_apps.joke.adapters.CustomSpinnerAdapter;
+import ua.matvienko_apps.joke.adapters.CategorySpinnerAdapter;
 import ua.matvienko_apps.joke.adapters.JokeCardAdapter;
-import ua.matvienko_apps.joke.data.AppDBContract;
+import ua.matvienko_apps.joke.classes.Category;
+import ua.matvienko_apps.joke.classes.Joke;
 import ua.matvienko_apps.joke.data.DataProvider;
 import ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView;
 
@@ -37,14 +37,20 @@ public class MainActivity extends AppCompatActivity {
     public static String APP_PREFERENCES = "JokePreferences";
     public static String HAS_VISITED = "HasVisited";
     public SharedPreferences sharedPreferences;
-    public JokeCardAdapter jokeAdapter;
+    ArrayList<Category> categories;
+    private JokeCardAdapter jokeAdapter;
     private ImageView appImageView;
     private ImageView favouritesImageView;
     private ArrayList<Joke> jokeArrayList;
     private SwipeFlingAdapterView flingContainer;
     private AdView adView;
+    private DataProvider dataProvider;
+    private CategorySpinnerAdapter categorySpinnerAdapter;
+    private Spinner spinner;
 
-
+    /**
+     * This function starts display tutorial arrow's and animate hiding
+     */
     private void startAppTutorialAnimation() {
         final FrameLayout mainLayout = (FrameLayout) findViewById(R.id.container);
         final ImageView leftTutorialImageView = new ImageView(MainActivity.this);
@@ -135,25 +141,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Init all of views
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.card_container);
         appImageView = (ImageView) findViewById(R.id.appImage);
         favouritesImageView = (ImageView) findViewById(R.id.favouritesImage);
+        adView = (AdView) findViewById(R.id.adView);
+        spinner = (Spinner) findViewById(R.id.spinnerCustom);
 
 
+        jokeArrayList = new ArrayList<>();
         sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
 
+
+        // Create preferences for store data about first launch
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         if (!sharedPreferences.getBoolean(HAS_VISITED, false)) {
             /**
              * There you can do operation's when app has first launch
              * **/
-            Log.d(TAG, "onCreate: firstLaunch");
-
             startAppTutorialAnimation();
 
             editor.putBoolean(HAS_VISITED, true);
             editor.apply();
         }
+
+
+        // Load an ad into the AdMob banner view.
+        AdRequest adRequest = new AdRequest.Builder()
+                .setRequestAgent("android_studio:ad_template").build();
+        adView.loadAd(adRequest);
 
 
         appImageView.setOnClickListener(new View.OnClickListener() {
@@ -173,45 +189,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // Load an ad into the AdMob banner view.
-        adView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .setRequestAgent("android_studio:ad_template").build();
-        adView.loadAd(adRequest);
-
-
-        DataProvider dataProvider = new DataProvider(getApplicationContext());
-
-        // fill array lie data for init jokeAdapter
-        jokeArrayList = new ArrayList<>();
-        jokeArrayList = dataProvider.getAllJokes(AppDBContract.JokeEntries.TABLE_NAME);
-
-        Spinner spinner = (Spinner) findViewById(R.id.spinnerCustom);
-        // Spinner Drop down elements
-        ArrayList<String> categories = new ArrayList<String>();
-        categories.add("Популярные");
-        categories.add("Свежие");
-        categories.add("О Вовочке");
-        categories.add("Автомобильные");
-        categories.add("Про Тёщу");
-        CustomSpinnerAdapter customSpinnerAdapter = new CustomSpinnerAdapter(MainActivity.this, categories);
-
-        spinner.setAdapter(customSpinnerAdapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                String item = parent.getItemAtPosition(position).toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        jokeAdapter = new JokeCardAdapter(jokeArrayList, MainActivity.this);
-        flingContainer.setAdapter(jokeAdapter);
+        // Init DataProvider for create database connection and get data from it
+        dataProvider = new DataProvider(getApplicationContext());
+        // List of all jokes from standard table
 
         flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
             @Override
@@ -223,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.leftSwipeImage).setAlpha(0);
                 jokeArrayList.remove(0);
                 jokeAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -230,7 +211,6 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.rightSwipeImage).setAlpha(0);
                 jokeArrayList.remove(0);
                 jokeAdapter.notifyDataSetChanged();
-
             }
 
             @Override
@@ -239,20 +219,30 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onScroll(float scrollProgressPercent) {
-//                View view = flingContainer.getSelectedView();
-//                view.findViewById(R.id.background).setAlpha(0);
-//                view.findViewById(R.id.item_swipe_right_indicator).setAlpha(scrollProgressPercent < 0 ? -scrollProgressPercent : 0);
-//                view.findViewById(R.id.item_swipe_left_indicator).setAlpha(scrollProgressPercent > 0 ? scrollProgressPercent : 0);
-
-
-//                Log.d(TAG, "onScroll: " + );
-
                 findViewById(R.id.leftSwipeImage).setAlpha(scrollProgressPercent < 0 ? -scrollProgressPercent : 0);
                 findViewById(R.id.rightSwipeImage).setAlpha(scrollProgressPercent > 0 ? scrollProgressPercent : 0);
+            }
+        });
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Category category = (Category) parent.getItemAtPosition(position);
+
+                DownloadJokesForCategory download = new DownloadJokesForCategory(category.getCategoryID());
+                download.execute();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
             }
         });
 
+        dataProvider.getAllJokesByCategoryFromDB(1);
+//        dataProvider.getAll();
+
+        UpgradeCategories upgradeCategories = new UpgradeCategories();
+        upgradeCategories.execute();
 
     }
 
@@ -281,5 +271,53 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         adView.destroy();
+    }
+
+    class UpgradeCategories extends AsyncTask {
+
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            categories = dataProvider.getCategories();
+//            jokeArrayList = dataProvider.getJokes();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            categorySpinnerAdapter = new CategorySpinnerAdapter(MainActivity.this, categories);
+            spinner.setAdapter(categorySpinnerAdapter);
+
+
+        }
+    }
+
+    class DownloadJokesForCategory extends AsyncTask {
+        private int categoryID;
+
+        public DownloadJokesForCategory(int categoryID) {
+            this.categoryID = categoryID;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            jokeArrayList.clear();
+            jokeAdapter = new JokeCardAdapter(jokeArrayList, MainActivity.this);
+            flingContainer.setAdapter(jokeAdapter);
+            jokeAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            jokeArrayList = dataProvider.getJokesByCategory(categoryID);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            jokeAdapter = new JokeCardAdapter(jokeArrayList, MainActivity.this);
+            flingContainer.setAdapter(jokeAdapter);
+            jokeAdapter.notifyDataSetChanged();
+        }
     }
 }

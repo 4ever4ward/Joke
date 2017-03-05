@@ -1,4 +1,4 @@
-package ua.matvienko_apps.joke;
+package ua.matvienko_apps.joke.classes;
 
 /**
  * Created by Alexandr on 15/02/2017.
@@ -12,15 +12,18 @@ public class Joke {
     public static int LIKE = 1;
     public static int DISLIKE = 0;
 
+    private int jokeID;
     private long jokeDate;
+
+
     private String jokeCategory;
     private String jokeText;
     private int jokeLikes;
     private int jokeDislikes;
 
-    public Joke(long jokeDate, String jokeCategory, String jokeText, int jokeLikes, int jokeDislikes) {
+    public Joke(int jokeID, long jokeDate, String jokeText, int jokeLikes, int jokeDislikes) {
+        this.jokeID = jokeID;
         this.jokeDate = jokeDate;
-        this.jokeCategory = jokeCategory;
         this.jokeText = jokeText;
         this.jokeLikes = jokeLikes;
         this.jokeDislikes = jokeDislikes;
@@ -71,5 +74,13 @@ public class Joke {
 
     public void setJokeDate(long jokeDate) {
         this.jokeDate = jokeDate;
+    }
+
+    public int getJokeID() {
+        return jokeID;
+    }
+
+    public void setJokeID(int jokeID) {
+        this.jokeID = jokeID;
     }
 }
