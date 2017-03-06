@@ -1,33 +1,41 @@
 package ua.matvienko_apps.joke.activity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-//import com.google.android.gms.ads.AdRequest;
-//import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
 import ua.matvienko_apps.joke.R;
 import ua.matvienko_apps.joke.adapters.JokeCardAdapter;
 import ua.matvienko_apps.joke.classes.Joke;
-import ua.matvienko_apps.joke.data.AppDBContract;
 import ua.matvienko_apps.joke.data.DataProvider;
 import ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView;
+
+//import com.google.android.gms.ads.AdRequest;
+//import com.google.android.gms.ads.AdView;
 
 public class FavouritesActivity extends AppCompatActivity {
 
     private final String TAG = FavouritesActivity.class.getSimpleName();
-//    AdView adView;
+
+    private AdView adView;
+    private TextView jokeQuantityText;
+
+    private DataProvider dataProvider;
     private SwipeFlingAdapterView flingContainer;
     private JokeCardAdapter jokeAdapter;
     private ArrayList<Joke> jokeBackStackList;
     private ArrayList<Joke> jokeArrayList;
-    private TextView jokeQuantityText;
-    private ImageView homeImageView;
+
+
+    private int favouritesListSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +44,8 @@ public class FavouritesActivity extends AppCompatActivity {
         // Find all of view's
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.card_container);
         jokeQuantityText = (TextView) findViewById(R.id.jokeQuantity);
-        homeImageView = (ImageView) findViewById(R.id.homeImage);
-//        adView = (AdView) findViewById(R.id.adView);
+        ImageView homeImageView = (ImageView) findViewById(R.id.homeImage);
+        adView = (AdView) findViewById(R.id.adView);
 
         // Init array's for next using
         jokeArrayList = new ArrayList<>();
@@ -45,24 +53,15 @@ public class FavouritesActivity extends AppCompatActivity {
 
 
         // Load an ad into the AdMob banner view.
-//        AdRequest adRequest = new AdRequest.Builder()
-//                .setRequestAgent("android_studio:ad_template").build();
-//        adView.loadAd(adRequest);
+        AdRequest adRequest = new AdRequest.Builder()
+                .setRequestAgent("android_studio:ad_template").build();
+        adView.loadAd(adRequest);
 
         // Init DataProvider for create database connection and get data from it
-        DataProvider dataProvider = new DataProvider(getApplicationContext());
+        dataProvider = new DataProvider(getApplicationContext());
 
-        // List of all joke's from favourites table
-        jokeArrayList = dataProvider.getAllJokesFromDB(AppDBContract.FavouritesEntry.TABLE_NAME);
-
-        jokeAdapter = new JokeCardAdapter(jokeArrayList, FavouritesActivity.this);
-        flingContainer.setAdapter(jokeAdapter);
-
-        final int favouritesListSize = jokeArrayList.size();
-
-        // Fill TextView, where displayed number and quantity of card's
-        jokeQuantityText.setText((jokeBackStackList.size()) + "/" + favouritesListSize);
-
+        // Get and set list of all joke's from favourites table
+        new InitFavourites().execute();
 
         homeImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,18 +114,44 @@ public class FavouritesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        adView.resume();
+        adView.resume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        adView.pause();
+        adView.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        adView.destroy();
+        adView.destroy();
     }
+
+    class InitFavourites extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            jokeArrayList = dataProvider.getFavourites();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            jokeAdapter = new JokeCardAdapter(jokeArrayList, FavouritesActivity.this);
+            flingContainer.setAdapter(jokeAdapter);
+            jokeAdapter.notifyDataSetChanged();
+
+            favouritesListSize = jokeArrayList.size();
+
+            // Fill TextView, where displayed number and quantity of card's
+            if (jokeArrayList.size() != 0) {
+                jokeQuantityText.setText((jokeBackStackList.size() + 1) + "/" + favouritesListSize);
+            } else {
+                jokeQuantityText.setText((jokeBackStackList.size()) + "/" + favouritesListSize);
+            }
+        }
+    }
+
 }

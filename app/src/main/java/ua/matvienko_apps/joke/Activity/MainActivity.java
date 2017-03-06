@@ -17,8 +17,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-//import com.google.android.gms.ads.AdRequest;
-//import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
@@ -27,8 +27,12 @@ import ua.matvienko_apps.joke.adapters.CategorySpinnerAdapter;
 import ua.matvienko_apps.joke.adapters.JokeCardAdapter;
 import ua.matvienko_apps.joke.classes.Category;
 import ua.matvienko_apps.joke.classes.Joke;
+import ua.matvienko_apps.joke.classes.Utility;
 import ua.matvienko_apps.joke.data.DataProvider;
 import ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView;
+
+//import com.google.android.gms.ads.AdRequest;
+//import com.google.android.gms.ads.AdView;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -38,15 +42,16 @@ public class MainActivity extends AppCompatActivity {
     public static String HAS_VISITED = "HasVisited";
     public SharedPreferences sharedPreferences;
     ArrayList<Category> categories;
-    private JokeCardAdapter jokeAdapter;
-    private ImageView appImageView;
-    private ImageView favouritesImageView;
-    private ArrayList<Joke> jokeArrayList;
     private SwipeFlingAdapterView flingContainer;
-//    private AdView adView;
-    private DataProvider dataProvider;
-    private CategorySpinnerAdapter categorySpinnerAdapter;
+    private AdView adView;
     private Spinner spinner;
+    private DataProvider dataProvider;
+    private JokeCardAdapter jokeAdapter;
+    private ArrayList<Joke> jokeArrayList;
+    private CategorySpinnerAdapter categorySpinnerAdapter;
+
+
+    private boolean starred = false;
 
     /**
      * This function starts display tutorial arrow's and animate hiding
@@ -143,9 +148,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Init all of views
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.card_container);
-        appImageView = (ImageView) findViewById(R.id.appImage);
-        favouritesImageView = (ImageView) findViewById(R.id.favouritesImage);
-//        adView = (AdView) findViewById(R.id.adView);
+        ImageView favouritesImageView = (ImageView) findViewById(R.id.favouritesImage);
+        adView = (AdView) findViewById(R.id.adView);
         spinner = (Spinner) findViewById(R.id.spinnerCustom);
 
 
@@ -167,18 +171,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Load an ad into the AdMob banner view.
-//        AdRequest adRequest = new AdRequest.Builder()
-//                .setRequestAgent("android_studio:ad_template").build();
-//        adView.loadAd(adRequest);
+        AdRequest adRequest = new AdRequest.Builder()
+                .setRequestAgent("android_studio:ad_template").build();
+        adView.loadAd(adRequest);
 
-
-        appImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), OurAppsActivity.class);
-                startActivity(intent);
-            }
-        });
 
         favouritesImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,6 +199,10 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.leftSwipeImage).setAlpha(0);
 
                 new SetVoteToJoke(jokeArrayList.get(0), Joke.LIKE).execute();
+                if (starred) {
+                    new AddToFavourites(jokeArrayList.get(0)).execute();
+                    starred = false;
+                }
 
                 jokeArrayList.remove(0);
                 jokeAdapter.notifyDataSetChanged();
@@ -214,10 +214,13 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.rightSwipeImage).setAlpha(0);
 
                 new SetVoteToJoke(jokeArrayList.get(0), Joke.DISLIKE).execute();
+                if (starred) {
+                    new AddToFavourites(jokeArrayList.get(0)).execute();
+                    starred = false;
+                }
 
                 jokeArrayList.remove(0);
                 jokeAdapter.notifyDataSetChanged();
-
 
             }
 
@@ -229,12 +232,24 @@ public class MainActivity extends AppCompatActivity {
             public void onScroll(float scrollProgressPercent) {
                 findViewById(R.id.leftSwipeImage).setAlpha(scrollProgressPercent < 0 ? -scrollProgressPercent : 0);
                 findViewById(R.id.rightSwipeImage).setAlpha(scrollProgressPercent > 0 ? scrollProgressPercent : 0);
+
+                if (Math.abs(scrollProgressPercent) == 1) {
+                    starred = flingContainer.getChildAt(1).findViewById(R.id.favouritesImageView).isActivated();
+                }
             }
         });
+
+        UpdateCategories updateCategories = new UpdateCategories();
+        updateCategories.execute();
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Category category = (Category) parent.getItemAtPosition(position);
+
+                jokeAdapter = new JokeCardAdapter(new ArrayList<Joke>(), MainActivity.this);
+                flingContainer.setAdapter(jokeAdapter);
+                jokeAdapter.notifyDataSetChanged();
 
                 DownloadJokesForCategory download = new DownloadJokesForCategory(category.getCategoryID());
                 download.execute();
@@ -246,19 +261,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        dataProvider.getAllJokesByCategoryFromDB(1);
-//        dataProvider.getAll();
-
-        UpgradeCategories upgradeCategories = new UpgradeCategories();
-        upgradeCategories.execute();
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        adView.resume();
-
+        adView.resume();
 //        // If banner not shown than hide adView
 //        if(!adView.isShown()) {
 //            adView.destroy();
@@ -272,35 +281,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-//        adView.pause();
+        adView.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        adView.destroy();
+        adView.destroy();
     }
 
-    class UpgradeCategories extends AsyncTask {
-
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-            categories = dataProvider.getCategories();
-//            jokeArrayList = dataProvider.getJokes();
-            return null;
-        }
+    class UpdateCategories extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected void onPostExecute(Object o) {
+        protected void onPostExecute(Void aVoid) {
             categorySpinnerAdapter = new CategorySpinnerAdapter(MainActivity.this, categories);
             spinner.setAdapter(categorySpinnerAdapter);
+        }
 
-
+        @Override
+        protected Void doInBackground(Void... params) {
+            categories = dataProvider.getCategories();
+            return null;
         }
     }
 
-    class DownloadJokesForCategory extends AsyncTask {
+    class DownloadJokesForCategory extends AsyncTask<Void, Void, Void> {
         private int categoryID;
 
         public DownloadJokesForCategory(int categoryID) {
@@ -308,28 +313,27 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPreExecute() {
-            jokeArrayList.clear();
-            jokeAdapter = new JokeCardAdapter(jokeArrayList, MainActivity.this);
-            flingContainer.setAdapter(jokeAdapter);
-            jokeAdapter.notifyDataSetChanged();
-        }
+        protected Void doInBackground(Void... params) {
+            if (categoryID == Category.CATEGORY_FRESH_ID) {
+                jokeArrayList = Utility.getNewestJokes(MainActivity.this);
 
-        @Override
-        protected Object doInBackground(Object[] params) {
-            jokeArrayList = dataProvider.getJokesByCategory(categoryID);
+            } else if (categoryID == Category.CATEGORY_POPULAR_ID) {
+                jokeArrayList = Utility.getPopularJokes(MainActivity.this);
+            } else {
+                jokeArrayList = dataProvider.getJokesByCategory(categoryID);
+            }
             return null;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
+        protected void onPostExecute(Void aVoid) {
             jokeAdapter = new JokeCardAdapter(jokeArrayList, MainActivity.this);
             flingContainer.setAdapter(jokeAdapter);
             jokeAdapter.notifyDataSetChanged();
         }
     }
 
-    class SetVoteToJoke extends AsyncTask {
+    class SetVoteToJoke extends AsyncTask<Void, Void, Void> {
 
         private Joke joke;
         private int jokeVote;
@@ -340,8 +344,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Object doInBackground(Object[] objects) {
+        protected Void doInBackground(Void... params) {
             dataProvider.setJokeVote(joke, jokeVote);
+            return null;
+        }
+    }
+
+    class AddToFavourites extends AsyncTask<Void, Void, Void> {
+
+        Joke joke;
+
+        AddToFavourites(Joke joke) {
+            this.joke = joke;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            dataProvider.addToFavourites(joke);
             return null;
         }
     }

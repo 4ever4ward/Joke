@@ -5,6 +5,10 @@ package ua.matvienko_apps.joke.classes;
  */
 
 public class Category {
+
+    public static final int CATEGORY_POPULAR_ID = 777;
+    public static final int CATEGORY_FRESH_ID = 888;
+
     private int categoryID;
     private String categoryName;
 

@@ -72,8 +72,10 @@ public class JokeCardAdapter extends BaseAdapter {
                 }
             });
 
-            if (context.getClass().getSimpleName().equals(FavouritesActivity.class.getSimpleName()))
+            if (context.getClass().getSimpleName().equals(FavouritesActivity.class.getSimpleName())) {
                 viewHolder.favouritesView.callOnClick();
+                viewHolder.favouritesView.setClickable(false);
+            }
 
             viewHolder.clipView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -108,7 +110,7 @@ public class JokeCardAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.jokeTextView.setText(jokeList.get(position).getJokeText());
+        viewHolder.jokeTextView.setText(jokeList.get(position).getJokeText() + " like=" + jokeList.get(position).getJokeLikes() + " dislike=" + jokeList.get(position).getJokeDislikes() + " " + jokeList.get(position).getJokeDate());
 
         return rootView;
     }
@@ -130,7 +132,7 @@ public class JokeCardAdapter extends BaseAdapter {
 
         public ViewHolder(View view) {
             jokeTextView = (TextView) view.findViewById(R.id.jokeText);
-            favouritesView = (ImageView) view.findViewById(R.id.starredView);
+            favouritesView = (ImageView) view.findViewById(R.id.favouritesImageView);
             clipView = (ImageView) view.findViewById(R.id.copyToClipBoardView);
             myScrollView = (CustomScrollView) view.findViewById(R.id.myScroll);
         }

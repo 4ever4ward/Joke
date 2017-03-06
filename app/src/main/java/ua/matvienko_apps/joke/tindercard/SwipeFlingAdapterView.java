@@ -134,7 +134,7 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
                 newUnderChild.findViewById(R.id.jokeText).setAlpha(0.30f);
                 newUnderChild.findViewById(R.id.copyToClipBoardView).setAlpha(0.30f);
                 newUnderChild.findViewById(R.id.shareView).setAlpha(0.30f);
-                newUnderChild.findViewById(R.id.starredView).setAlpha(0.30f);
+                newUnderChild.findViewById(R.id.favouritesImageView).setAlpha(0.30f);
 
                 newUnderChild.setTranslationY(12f);
                 newUnderChild.setScaleX(0.977f);

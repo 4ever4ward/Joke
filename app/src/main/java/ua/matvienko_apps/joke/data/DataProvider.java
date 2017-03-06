@@ -9,6 +9,7 @@ import android.util.Log;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -22,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,38 +34,26 @@ import ua.matvienko_apps.joke.classes.Category;
 import ua.matvienko_apps.joke.classes.Joke;
 import ua.matvienko_apps.joke.classes.Utility;
 
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
-
 
 public class DataProvider {
 
-    private final String PARAM_UUID = "uuid";
+    private static String TAG = DataProvider.class.getSimpleName();
     private final String API_URL = "http://app1.app.trafficterminal.com/api/";
     private final String RESPONSE = "response";
+    private final String PARAM_UUID = "uuid";
+    private final String PARAM_JOKE_ID = "id_joke";
+    private final String PARAM_CATEGORY_ID = "category_id";
     private AppDBHelper appDBHelper;
     private Context context;
+
 
     public DataProvider(Context context) {
         this.appDBHelper = new AppDBHelper(context, AppDBContract.DB_NAME, null, AppDBContract.DB_VERSION);
         this.context = context;
     }
 
-    private String inputStreamToString(InputStream is) throws IOException {
-        String line;
-        StringBuilder total = new StringBuilder();
-
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-
-        while ((line = rd.readLine()) != null)
-            total.append(line);
-
-        return total.toString();
-    }
 
     public void setJokeVote(Joke joke, int jokeVoteID) {
-
-        final String PARAM_JOKE_ID = "id_joke";
-
         final String PARAM_JOKE_LIKE = "like";
         final String PARAM_JOKE_DISLIKE = "dislike";
 
@@ -85,9 +75,43 @@ public class DataProvider {
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             HttpResponse response = httpclient.execute(httppost);
 
+        } catch (ClientProtocolException e) {
+            Log.e(TAG, "setJokeVote: Problem with Internet connection", e);
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "setJokeVote: UnsupportedEncodingException", e);
         } catch (IOException e) {
-            Log.e(TAG, "setJokeVote: No Internet", e );
+            Log.e(TAG, "setJokeVote: IOException", e);
         }
+
+    }
+
+    public void addToFavourites(Joke joke) {
+
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost(API_URL + "favourites");
+
+        try {
+            List<NameValuePair> nameValuePairs = new ArrayList<>(2);
+            nameValuePairs.add(new BasicNameValuePair(PARAM_UUID, getUUID()));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_JOKE_ID, Integer.toString(joke.getJokeID())));
+
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            HttpResponse response = httpclient.execute(httppost);
+            String favouritesJsonStr = inputStreamToString(response.getEntity().getContent());
+            Log.e(TAG, "addToFavourites: favouritesJsonStr" + favouritesJsonStr);
+
+
+        } catch (ClientProtocolException e) {
+            Log.e(TAG, "addToFavourites: Problem with Internet connection", e);
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "addToFavourites: UnsupportedEncodingException", e);
+        } catch (IOException e) {
+            Log.e(TAG, "addToFavourites: IOException", e);
+        }
+
+        if (getJokeByID(joke.getJokeID(), AppDBContract.FavouritesEntry.TABLE_NAME) == null)
+            addFavourites(joke);
 
     }
 
@@ -105,18 +129,22 @@ public class DataProvider {
             // Execute HTTP Post Request
             HttpResponse response = httpclient.execute(httppost);
             String jokeJsonStr = inputStreamToString(response.getEntity().getContent());
+            Log.e(TAG, "getJokes: " + jokeJsonStr);
             getJokeDataFromJson(jokeJsonStr);
 
-        } catch (IOException | JSONException e) {
-            Log.e(TAG, "getJokes: No Internet", e);
+        } catch (ClientProtocolException e) {
+            Log.e(TAG, "getJokes: Problem with Internet connection", e);
+        } catch (JSONException e) {
+            Log.e(TAG, "getJokes: Invalid JSON", e);
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "getJokes: UnsupportedEncodingException", e);
+        } catch (IOException e) {
+            Log.e(TAG, "getJokes: IOException", e);
         }
         return getAllJokesFromDB(AppDBContract.JokeEntry.TABLE_NAME);
     }
 
     public ArrayList<Joke> getJokesByCategory(int categoryID) {
-
-        final String PARAM_CATEGORY_ID = "category_id";
-
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost(API_URL + "list");
@@ -124,7 +152,7 @@ public class DataProvider {
         try {
             // Add parameters
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair(PARAM_UUID, getUUID() + "3"));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_UUID, getUUID()));
             nameValuePairs.add(new BasicNameValuePair(PARAM_CATEGORY_ID, Integer.toString(categoryID)));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
@@ -133,8 +161,14 @@ public class DataProvider {
             String jokeJsonStr = inputStreamToString(response.getEntity().getContent());
             getJokeDataFromJson(jokeJsonStr);
 
-        } catch (IOException | JSONException e) {
-            Log.e(TAG, "getJokesByCategory: No Internet", e);
+        } catch (ClientProtocolException e) {
+            Log.e(TAG, "getJokesByCategory: Problem with Internet connection", e);
+        } catch (JSONException e) {
+            Log.e(TAG, "getJokesByCategory: Invalid JSON", e);
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "getJokesByCategory: UnsupportedEncodingException", e);
+        } catch (IOException e) {
+            Log.e(TAG, "getJokesByCategory: IOException", e);
         }
         return getAllJokesByCategoryFromDB(categoryID);
     }
@@ -156,12 +190,47 @@ public class DataProvider {
             // Put data from json to db
             getCategoriesFromJson(jsonStr);
 
-        } catch (IOException | JSONException e) {
-            Log.e(TAG, "getCategories: No Internet", e);
+        } catch (ClientProtocolException e) {
+            Log.e(TAG, "getCategories: Problem with Internet connection", e);
+        } catch (JSONException e) {
+            Log.e(TAG, "getCategories: Invalid JSON", e);
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "getCategories: UnsupportedEncodingException", e);
+        } catch (IOException e) {
+            Log.e(TAG, "getCategories: IOException", e);
         }
 
         return getAllCategoriesFromDB();
     }
+
+    public ArrayList<Joke> getFavourites() {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost(API_URL + "favourites");
+
+        try {
+            // Add parameters
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+            nameValuePairs.add(new BasicNameValuePair(PARAM_UUID, getUUID()));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+            String jokeJsonStr = inputStreamToString(response.getEntity().getContent());
+            Log.e(TAG, "getFavourites: " + jokeJsonStr);
+            getFavouriteDataFromJsom(jokeJsonStr);
+
+        } catch (ClientProtocolException e) {
+            Log.e(TAG, "getFavourites: Problem with Internet connection", e);
+        } catch (JSONException e) {
+            Log.e(TAG, "getFavourites: Invalid JSON", e);
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "getFavourites: UnsupportedEncodingException", e);
+        } catch (IOException e) {
+            Log.e(TAG, "getFavourites: IOException", e);
+        }
+        return getAllJokesFromDB(AppDBContract.FavouritesEntry.TABLE_NAME);
+    }
+
 
     private void getCategoriesFromJson(String jokeJsonStr) throws JSONException {
         final String CATEGORY_ID = "id";
@@ -172,6 +241,13 @@ public class DataProvider {
 
         JSONArray categoriesJsonList = responseArrayJson.getJSONArray(1);
 
+        // Add category Popular and category Fresh on first create
+        if (getCategoryByID(Category.CATEGORY_FRESH_ID) == null && getCategoryByID(Category.CATEGORY_POPULAR_ID) == null) {
+            addCategory(new Category(Category.CATEGORY_POPULAR_ID, "Популярные"));
+            addCategory(new Category(Category.CATEGORY_FRESH_ID, "Свежие"));
+        }
+
+        // Add categories from json to table
         for (int i = 0; i < categoriesJsonList.length(); i++) {
             JSONObject category = categoriesJsonList.getJSONObject(i);
 
@@ -184,6 +260,7 @@ public class DataProvider {
     }
 
     private void getJokeDataFromJson(String jokeJsonStr) throws JSONException {
+
         final String ID = "id";
         final String CATEGORY = "category";
         final String DATE = "date_added";
@@ -198,12 +275,15 @@ public class DataProvider {
         Iterator x = jokeListJsonStr.keys();
         JSONArray jokeListJsonArr = new JSONArray();
 
+        // Part of code where we transform JSONObject to JSONArray
         while (x.hasNext()) {
             String key = (String) x.next();
             jokeListJsonArr.put(jokeListJsonStr.get(key));
         }
 
+        // Find all jokes in JSON
         for (int i = 0; i < jokeListJsonArr.length(); i++) {
+
             JSONObject joke = jokeListJsonArr.getJSONObject(i);
 
             String jokeDateStr = joke.getString(DATE);
@@ -216,24 +296,27 @@ public class DataProvider {
                 int jokeLikes = joke.getInt(LIKES);
                 int jokeDislikes = joke.getInt(DISLIKES);
 
-
+                // If not exists joke with jokeID then add new joke
                 if (getJokeByID(jokeID, AppDBContract.JokeEntry.TABLE_NAME) == null) {
 
-                    String[] jokeCategories = jokeCategory.substring(1, jokeCategory.length() - 1).split(",");
-
-                    for (int j = 0; j < jokeCategories.length; j++) {
-
-                        Log.e(TAG, "getJokeDataFromJson: JokeID = " + jokeID);
-                        addJoke(new Joke(jokeID,
-                                        jokeDate.getTimeInMillis(),
-                                        jokeText,
-                                        jokeLikes,
-                                        jokeDislikes),
-                                Integer.parseInt(jokeCategories[j]));
-                    }
+                    // jokeCategory may have inside more than 1 categories
+                    addJoke(new Joke(jokeID,
+                                    jokeDate.getTimeInMillis(),
+                                    jokeText,
+                                    jokeLikes,
+                                    jokeDislikes),
+                            jokeCategory);
+                    // If exists then upgrade joke with this id
+                } else {
+                    updateJoke(new Joke(jokeID,
+                            jokeDate.getTimeInMillis(),
+                            jokeText,
+                            jokeLikes,
+                            jokeDislikes));
                 }
+
             } catch (ParseException e) {
-                Log.e(TAG, "getJokeDataFromJson: ", e);
+                Log.e(TAG, "getJokeDataFromJson: ParseException", e);
             }
 
         }
@@ -241,7 +324,11 @@ public class DataProvider {
 
     }
 
-    public ArrayList<Joke> getAllJokesByCategoryFromDB(int categoryID) {
+    private void getFavouriteDataFromJsom(String favouritesJsonStr) throws JSONException {
+
+    }
+
+    private ArrayList<Joke> getAllJokesByCategoryFromDB(int categoryID) {
         SQLiteDatabase db = appDBHelper.getReadableDatabase();
 
         ArrayList<Joke> jokesList = new ArrayList<Joke>();
@@ -327,7 +414,8 @@ public class DataProvider {
         return categoryList;
     }
 
-    public Joke getJokeByID(int id, String tableName) {
+
+    private Joke getJokeByID(int id, String tableName) {
         SQLiteDatabase db = appDBHelper.getReadableDatabase();
         String query = "SELECT * FROM "
                 + tableName
@@ -351,7 +439,7 @@ public class DataProvider {
         return joke;
     }
 
-    public Category getCategoryByID(int id) {
+    private Category getCategoryByID(int id) {
         SQLiteDatabase db = appDBHelper.getReadableDatabase();
 
         String query = "SELECT * FROM "
@@ -371,10 +459,28 @@ public class DataProvider {
         return category;
     }
 
-    public void addJoke(Joke joke, int categoryID) {
+
+    private void updateJoke(Joke joke) {
+        SQLiteDatabase db = appDBHelper.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(AppDBContract.JokeEntry.COLUMN_ID, joke.getJokeID());
+        contentValues.put(AppDBContract.JokeEntry.COLUMN_JOKE_DATE, joke.getJokeDate());
+        contentValues.put(AppDBContract.JokeEntry.COLUMN_JOKE_TEXT, joke.getJokeText());
+        contentValues.put(AppDBContract.JokeEntry.COLUMN_JOKE_LIKES, joke.getJokeLikes());
+        contentValues.put(AppDBContract.JokeEntry.COLUMN_JOKE_DISLIKES, joke.getJokeDislikes());
+
+        db.update(AppDBContract.JokeEntry.TABLE_NAME, contentValues,
+                AppDBContract.JokeEntry.COLUMN_ID + " = ?", new String[]{String.valueOf(joke.getJokeID())});
+        db.close();
+    }
+
+    private void addJoke(Joke joke, String categoryIDs) {
         SQLiteDatabase db = appDBHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
+        // Add joke to jokes
         contentValues.put(AppDBContract.JokeEntry.COLUMN_ID, joke.getJokeID());
         contentValues.put(AppDBContract.JokeEntry.COLUMN_JOKE_DATE, joke.getJokeDate());
         contentValues.put(AppDBContract.JokeEntry.COLUMN_JOKE_TEXT, joke.getJokeText());
@@ -384,14 +490,35 @@ public class DataProvider {
         db.insert(AppDBContract.JokeEntry.TABLE_NAME, null, contentValues);
         contentValues.clear();
 
-        contentValues.put(AppDBContract.PrePackingEntry.COLUMN_JOKE_ID, joke.getJokeID());
-        contentValues.put(AppDBContract.PrePackingEntry.COLUMN_CATEGORY_ID, categoryID);
+        String[] jokeCategories = categoryIDs.substring(1, categoryIDs.length() - 1).split(",");
 
-        db.insert(AppDBContract.PrePackingEntry.TABLE_NAME, null, contentValues);
+        // Add all relations for joke and it categories
+        for (int j = 0; j < jokeCategories.length; j++) {
+
+            contentValues.put(AppDBContract.PrePackingEntry.COLUMN_JOKE_ID, joke.getJokeID());
+            contentValues.put(AppDBContract.PrePackingEntry.COLUMN_CATEGORY_ID, Integer.parseInt(jokeCategories[j]));
+
+            db.insert(AppDBContract.PrePackingEntry.TABLE_NAME, null, contentValues);
+        }
         db.close();
     }
 
-    public void addCategory(Category category) {
+    private void addFavourites(Joke joke) {
+        SQLiteDatabase db = appDBHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(AppDBContract.FavouritesEntry.COLUMN_ID, joke.getJokeID());
+        contentValues.put(AppDBContract.FavouritesEntry.COLUMN_JOKE_DATE, joke.getJokeDate());
+        contentValues.put(AppDBContract.FavouritesEntry.COLUMN_JOKE_TEXT, joke.getJokeText());
+        contentValues.put(AppDBContract.FavouritesEntry.COLUMN_JOKE_LIKES, joke.getJokeLikes());
+        contentValues.put(AppDBContract.FavouritesEntry.COLUMN_JOKE_DISLIKES, joke.getJokeDislikes());
+
+        db.insert(AppDBContract.FavouritesEntry.TABLE_NAME, null, contentValues);
+        db.close();
+
+    }
+
+    private void addCategory(Category category) {
         SQLiteDatabase db = appDBHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -402,42 +529,25 @@ public class DataProvider {
         db.close();
     }
 
+
     private String getUUID() {
         String device_uuid = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         String packageName = context.getPackageName();
 
-        return packageName + "::" + device_uuid;
+        //TODO: change to device_uuid
+        return packageName + "::" + "gsdfgsdfgdfs";//device_uuid;
     }
 
-//    public ArrayList<Joke> getAllJokesByCategory(String tableName, String category) {
-//        SQLiteDatabase db = appDBHelper.getReadableDatabase();
-//
-//        ArrayList<Joke> jokesList = new ArrayList<Joke>();
-//
-//        String query = "SELECT * FROM "
-//                + tableName
-//                + " WHERE "
-//                + AppDBContract.JokeEntry.COLUMN_JOKE_CATEGORY + " == " + category
-//                + " ORDER BY "
-//                + AppDBContract.JokeEntry.COLUMN_JOKE_DATE + " ASC";
-//
-//        Cursor cursor = db.rawQuery(query, null);
-//
-//        if (cursor.moveToFirst()) {
-//            do {
-//                Joke joke = new Joke(cursor.getInt(0),
-//                        cursor.getLong(1),
-//                        cursor.getString(2),
-//                        cursor.getString(3),
-//                        cursor.getInt(4),
-//                        cursor.getInt(5));
-//
-//                jokesList.add(joke);
-//            } while (cursor.moveToNext());
-//        }
-//
-//        db.close();
-//        cursor.close();
-//        return jokesList;
-//    }
+    private String inputStreamToString(InputStream is) throws IOException {
+        String line;
+        StringBuilder total = new StringBuilder();
+
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+
+        while ((line = rd.readLine()) != null)
+            total.append(line);
+
+        return total.toString();
+    }
+
 }
