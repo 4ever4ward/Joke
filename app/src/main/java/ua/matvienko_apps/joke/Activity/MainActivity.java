@@ -233,8 +233,10 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.leftSwipeImage).setAlpha(scrollProgressPercent < 0 ? -scrollProgressPercent : 0);
                 findViewById(R.id.rightSwipeImage).setAlpha(scrollProgressPercent > 0 ? scrollProgressPercent : 0);
 
-                if (Math.abs(scrollProgressPercent) == 1) {
+                if (Math.abs(scrollProgressPercent) == 1 && jokeArrayList.size() > 1) {
                     starred = flingContainer.getChildAt(1).findViewById(R.id.favouritesImageView).isActivated();
+                } else {
+                    starred = flingContainer.getChildAt(0).findViewById(R.id.favouritesImageView).isActivated();
                 }
             }
         });
