@@ -9,8 +9,8 @@ public class Joke {
     public static int FAVOURITES_TRUE = 1;
     public static int FAVOURITES_FALSE = 0;
 
-    public static int LIKE = 1;
-    public static int DISLIKE = 0;
+    public static final int LIKE = 1;
+    public static final int DISLIKE = 0;
 
     private int jokeID;
     private long jokeDate;

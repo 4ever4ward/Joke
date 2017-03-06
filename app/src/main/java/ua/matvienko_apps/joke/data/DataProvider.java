@@ -34,14 +34,11 @@ import ua.matvienko_apps.joke.classes.Utility;
 
 import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
-/**
- * Created by Alexandr on 01/03/2017.
- */
 
 public class DataProvider {
 
     private final String PARAM_UUID = "uuid";
-    private final String API_URL = "http://app1.app.trafficterminal.com/api/list";
+    private final String API_URL = "http://app1.app.trafficterminal.com/api/";
     private final String RESPONSE = "response";
     private AppDBHelper appDBHelper;
     private Context context;
@@ -63,11 +60,41 @@ public class DataProvider {
         return total.toString();
     }
 
+    public void setJokeVote(Joke joke, int jokeVoteID) {
+
+        final String PARAM_JOKE_ID = "id_joke";
+
+        final String PARAM_JOKE_LIKE = "like";
+        final String PARAM_JOKE_DISLIKE = "dislike";
+
+        String paramJokeVote = null;
+
+        if (jokeVoteID == Joke.LIKE) {
+            paramJokeVote = PARAM_JOKE_LIKE;
+        } else if (jokeVoteID == Joke.DISLIKE) {
+            paramJokeVote = PARAM_JOKE_DISLIKE;
+        }
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(API_URL + paramJokeVote);
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+            nameValuePairs.add(new BasicNameValuePair(PARAM_UUID, getUUID()));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_JOKE_ID, Integer.toString(joke.getJokeID())));
+
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            HttpResponse response = httpclient.execute(httppost);
+
+        } catch (IOException e) {
+            Log.e(TAG, "setJokeVote: No Internet", e );
+        }
+
+    }
 
     public ArrayList<Joke> getJokes() {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(API_URL);
+        HttpPost httppost = new HttpPost(API_URL + "list");
 
         try {
             // Add parameters
@@ -81,7 +108,7 @@ public class DataProvider {
             getJokeDataFromJson(jokeJsonStr);
 
         } catch (IOException | JSONException e) {
-            Log.e(TAG, "getJokes: ", e);
+            Log.e(TAG, "getJokes: No Internet", e);
         }
         return getAllJokesFromDB(AppDBContract.JokeEntry.TABLE_NAME);
     }
@@ -92,12 +119,12 @@ public class DataProvider {
 
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(API_URL);
+        HttpPost httppost = new HttpPost(API_URL + "list");
 
         try {
             // Add parameters
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair(PARAM_UUID, getUUID()));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_UUID, getUUID() + "3"));
             nameValuePairs.add(new BasicNameValuePair(PARAM_CATEGORY_ID, Integer.toString(categoryID)));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
@@ -107,14 +134,14 @@ public class DataProvider {
             getJokeDataFromJson(jokeJsonStr);
 
         } catch (IOException | JSONException e) {
-            Log.e(TAG, "getJokes: ", e);
+            Log.e(TAG, "getJokesByCategory: No Internet", e);
         }
         return getAllJokesByCategoryFromDB(categoryID);
     }
 
     public ArrayList<Category> getCategories() {
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(API_URL);
+        HttpPost httppost = new HttpPost(API_URL + "list");
 
         try {
             // Add parameters
@@ -130,7 +157,7 @@ public class DataProvider {
             getCategoriesFromJson(jsonStr);
 
         } catch (IOException | JSONException e) {
-            Log.e(TAG, "getCategories: ERROR", e);
+            Log.e(TAG, "getCategories: No Internet", e);
         }
 
         return getAllCategoriesFromDB();
@@ -195,6 +222,8 @@ public class DataProvider {
                     String[] jokeCategories = jokeCategory.substring(1, jokeCategory.length() - 1).split(",");
 
                     for (int j = 0; j < jokeCategories.length; j++) {
+
+                        Log.e(TAG, "getJokeDataFromJson: JokeID = " + jokeID);
                         addJoke(new Joke(jokeID,
                                         jokeDate.getTimeInMillis(),
                                         jokeText,

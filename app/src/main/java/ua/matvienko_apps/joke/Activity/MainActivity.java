@@ -17,8 +17,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+//import com.google.android.gms.ads.AdRequest;
+//import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView favouritesImageView;
     private ArrayList<Joke> jokeArrayList;
     private SwipeFlingAdapterView flingContainer;
-    private AdView adView;
+//    private AdView adView;
     private DataProvider dataProvider;
     private CategorySpinnerAdapter categorySpinnerAdapter;
     private Spinner spinner;
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.card_container);
         appImageView = (ImageView) findViewById(R.id.appImage);
         favouritesImageView = (ImageView) findViewById(R.id.favouritesImage);
-        adView = (AdView) findViewById(R.id.adView);
+//        adView = (AdView) findViewById(R.id.adView);
         spinner = (Spinner) findViewById(R.id.spinnerCustom);
 
 
@@ -167,9 +167,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Load an ad into the AdMob banner view.
-        AdRequest adRequest = new AdRequest.Builder()
-                .setRequestAgent("android_studio:ad_template").build();
-        adView.loadAd(adRequest);
+//        AdRequest adRequest = new AdRequest.Builder()
+//                .setRequestAgent("android_studio:ad_template").build();
+//        adView.loadAd(adRequest);
 
 
         appImageView.setOnClickListener(new View.OnClickListener() {
@@ -201,6 +201,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLeftCardExit(Object dataObject) {
                 findViewById(R.id.leftSwipeImage).setAlpha(0);
+
+                new SetVoteToJoke(jokeArrayList.get(0), Joke.LIKE).execute();
+
                 jokeArrayList.remove(0);
                 jokeAdapter.notifyDataSetChanged();
 
@@ -209,8 +212,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRightCardExit(Object dataObject) {
                 findViewById(R.id.rightSwipeImage).setAlpha(0);
+
+                new SetVoteToJoke(jokeArrayList.get(0), Joke.DISLIKE).execute();
+
                 jokeArrayList.remove(0);
                 jokeAdapter.notifyDataSetChanged();
+
+
             }
 
             @Override
@@ -249,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        adView.resume();
+//        adView.resume();
 
 //        // If banner not shown than hide adView
 //        if(!adView.isShown()) {
@@ -264,13 +272,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        adView.pause();
+//        adView.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        adView.destroy();
+//        adView.destroy();
     }
 
     class UpgradeCategories extends AsyncTask {
@@ -318,6 +326,23 @@ public class MainActivity extends AppCompatActivity {
             jokeAdapter = new JokeCardAdapter(jokeArrayList, MainActivity.this);
             flingContainer.setAdapter(jokeAdapter);
             jokeAdapter.notifyDataSetChanged();
+        }
+    }
+
+    class SetVoteToJoke extends AsyncTask {
+
+        private Joke joke;
+        private int jokeVote;
+
+        SetVoteToJoke(Joke joke, int jokeVote) {
+            this.joke = joke;
+            this.jokeVote = jokeVote;
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            dataProvider.setJokeVote(joke, jokeVote);
+            return null;
         }
     }
 }

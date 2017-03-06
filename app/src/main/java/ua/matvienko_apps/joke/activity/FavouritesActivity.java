@@ -6,8 +6,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+//import com.google.android.gms.ads.AdRequest;
+//import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ import ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView;
 public class FavouritesActivity extends AppCompatActivity {
 
     private final String TAG = FavouritesActivity.class.getSimpleName();
-    AdView adView;
+//    AdView adView;
     private SwipeFlingAdapterView flingContainer;
     private JokeCardAdapter jokeAdapter;
     private ArrayList<Joke> jokeBackStackList;
@@ -37,7 +37,7 @@ public class FavouritesActivity extends AppCompatActivity {
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.card_container);
         jokeQuantityText = (TextView) findViewById(R.id.jokeQuantity);
         homeImageView = (ImageView) findViewById(R.id.homeImage);
-        adView = (AdView) findViewById(R.id.adView);
+//        adView = (AdView) findViewById(R.id.adView);
 
         // Init array's for next using
         jokeArrayList = new ArrayList<>();
@@ -45,9 +45,9 @@ public class FavouritesActivity extends AppCompatActivity {
 
 
         // Load an ad into the AdMob banner view.
-        AdRequest adRequest = new AdRequest.Builder()
-                .setRequestAgent("android_studio:ad_template").build();
-        adView.loadAd(adRequest);
+//        AdRequest adRequest = new AdRequest.Builder()
+//                .setRequestAgent("android_studio:ad_template").build();
+//        adView.loadAd(adRequest);
 
         // Init DataProvider for create database connection and get data from it
         DataProvider dataProvider = new DataProvider(getApplicationContext());
@@ -115,18 +115,18 @@ public class FavouritesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        adView.resume();
+//        adView.resume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        adView.pause();
+//        adView.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        adView.destroy();
+//        adView.destroy();
     }
 }

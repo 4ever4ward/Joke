@@ -5,6 +5,7 @@ package ua.matvienko_apps.joke.classes;
  */
 
 public class App {
+
     private String name;
     private String description;
     private int appImageId;

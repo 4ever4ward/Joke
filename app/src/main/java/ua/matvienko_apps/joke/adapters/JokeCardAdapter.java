@@ -108,7 +108,7 @@ public class JokeCardAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.jokeTextView.setText(jokeList.get(position).getJokeText());
+        viewHolder.jokeTextView.setText(jokeList.get(position).getJokeText() + " like=" + jokeList.get(position).getJokeLikes() + " dislike=" + jokeList.get(position).getJokeDislikes());
 
         return rootView;
     }
