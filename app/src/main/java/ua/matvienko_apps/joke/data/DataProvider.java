@@ -88,7 +88,7 @@ public class DataProvider {
     public void addToFavourites(Joke joke) {
 
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(API_URL + "favourites");
+        HttpPost httppost = new HttpPost(API_URL + "favorite");
 
         try {
             List<NameValuePair> nameValuePairs = new ArrayList<>(2);
@@ -205,7 +205,7 @@ public class DataProvider {
 
     public ArrayList<Joke> getFavourites() {
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(API_URL + "favourites");
+        HttpPost httppost = new HttpPost(API_URL + "favorites");
 
         try {
             // Add parameters
