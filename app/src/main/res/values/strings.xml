@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Joke</string>
+    <string name="app_name">Смешные анекдоты</string>
     <string name="title_activity_our_apps">OurAppsActivity</string>
 
     <string name="action_settings">Settings</string>
@@ -11,6 +11,6 @@
     <!- -->
     <!--<string name="banner_ad_unit_id">ca-app-pub-3940256099942544~3347511713</string>-->
 
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5557077775380446/8336576218</string>
     <string name="favorites_title">Избранные</string>
 </resources>

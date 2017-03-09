@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background"
     android:orientation="vertical"
-    tools:context=".activity.MainActivity">
+    tools:context="com.sleuprua.activity.MainActivity">
 
 
     <FrameLayout
@@ -24,7 +24,7 @@
                 android:layout_height="40dp"
                 android:layout_gravity="start"
                 android:layout_marginLeft="5dp"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/smile" />
 
             <Spinner
                 android:id="@+id/spinnerCustom"
@@ -33,19 +33,41 @@
                 android:layout_gravity="center"
                 android:layout_marginEnd="15dp"
                 android:layout_marginStart="15dp"
-                android:background="@drawable/spinner_background" />
+                android:background="@drawable/spinner_background"
+                android:spinnerMode="dialog" />
 
-            <ImageView
-                android:id="@+id/favouritesImage"
-                android:layout_width="40dp"
+            <FrameLayout
+                android:layout_width="43dp"
                 android:layout_height="40dp"
-                android:layout_gravity="end"
-                android:layout_marginRight="5dp"
-                android:src="@drawable/ic_star" />
+                android:layout_gravity="end">
+
+                <ImageView
+                    android:id="@+id/favouritesImage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="end"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/ic_star" />
+
+                <TextView
+                    android:id="@+id/favorites_items_text"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="end"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@drawable/circle"
+                    android:gravity="center"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="9dp" />
+
+
+            </FrameLayout>
 
         </FrameLayout>
 
-        <ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView
+        <com.sleuprua.tindercard.SwipeFlingAdapterView
             android:id="@+id/card_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
