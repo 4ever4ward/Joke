@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background"
     android:orientation="vertical"
-    tools:context="com.sleuprua.activity.OurAppsActivity">
+    tools:context="ua.matvienko_apps.joke.activity.OurAppsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

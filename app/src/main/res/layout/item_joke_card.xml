@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:padding="16dp">
 
-            <com.sleuprua.classes.CustomScrollView
+            <ua.matvienko_apps.joke.classes.CustomScrollView
                 android:id="@+id/myScroll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -36,7 +36,7 @@
                     android:text="На следующей неделе моя жена с детьми уезжает погостить у мамы. И я на две недели, вместе с диваном, телеканалом &quot;Спорт&quot;, пивом, удочками, лодкой и многочисленными друзьями медленно погружусь в пучину &quot;одиночества&quot;. "
                     android:textColor="#434343"
                     android:textSize="18sp" />
-            </com.sleuprua.classes.CustomScrollView>
+            </ua.matvienko_apps.joke.classes.CustomScrollView>
 
             <FrameLayout
                 android:layout_width="match_parent"

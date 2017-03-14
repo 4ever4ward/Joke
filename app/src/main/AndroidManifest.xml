@@ -17,11 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MainActivity"
+            android:name="ua.matvienko_apps.joke.activity.MainActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activity.FavouritesActivity"
+            android:name="ua.matvienko_apps.joke.activity.FavouritesActivity"
             android:screenOrientation="portrait" />
         This meta-data tag is required to use Google Play Services.
         <meta-data
@@ -38,11 +38,11 @@
         <!--android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode| screenSize|smallestScreenSize" />-->
 
         <activity
-            android:name=".activity.OurAppsActivity"
+            android:name="ua.matvienko_apps.joke.activity.OurAppsActivity"
             android:label="@string/title_activity_our_apps"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.SplashActivity"
+            android:name="ua.matvienko_apps.joke.activity.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

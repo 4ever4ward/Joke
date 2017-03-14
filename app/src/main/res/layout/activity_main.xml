@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background"
     android:orientation="vertical"
-    tools:context="com.sleuprua.activity.MainActivity">
+    tools:context="ua.matvienko_apps.joke.activity.MainActivity">
 
 
     <FrameLayout
@@ -67,7 +67,7 @@
 
         </FrameLayout>
 
-        <com.sleuprua.tindercard.SwipeFlingAdapterView
+        <ua.matvienko_apps.joke.tindercard.SwipeFlingAdapterView
             android:id="@+id/card_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
